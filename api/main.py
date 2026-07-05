@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from core.database import get_db
 
 app = FastAPI(
     title="RunaTranslate API",

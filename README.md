@@ -58,19 +58,19 @@ El sistema está estructurado bajo una arquitectura modular y desacoplada (monor
 runa-translate-ai/
 ├── README.md                # Presentación general del proyecto (este archivo)
 ├── AGENTS.md                # Directrices del proyecto, base de datos y endpoints
-├── apps/
-│   ├── api/                 # Backend FastAPI (Python)
-│   │   ├── main.py          # Punto de entrada
-│   │   ├── core/            # Configuración de base de datos y entorno
-│   │   ├── models/          # Esquemas Pydantic y MongoDB
-│   │   ├── routers/         # Controladores de rutas de la API
-│   │   └── services/        # Servicios de traducción e integración de IA
-│   └── web/                 # Frontend React (TypeScript + Vite)
-│       ├── index.html       # Archivo HTML de entrada
-│       ├── src/
-│       │   ├── components/  # Componentes interactivos y UI
-│       │   ├── pages/       # Vistas de la aplicación (Traductor, Historial, Admin)
-│       │   └── services/    # Clientes de API y conexiones externas
+├── package.json             # Atajos de ejecución del monorepo
+├── api/                     # Backend FastAPI (Python)
+│   ├── main.py              # Punto de entrada
+│   ├── core/                # Configuración de base de datos y entorno
+│   ├── models/              # Esquemas Pydantic y MongoDB
+│   ├── routers/             # Controladores de rutas de la API
+│   └── services/            # Servicios de traducción e integración de IA
+└── web/                     # Frontend React (TypeScript + Vite)
+    ├── index.html           # Archivo HTML de entrada
+    ├── src/
+    │   ├── components/      # Componentes interactivos y UI
+    │   ├── pages/           # Vistas de la aplicación (Traductor, Historial, Admin)
+    │   └── services/        # Clientes de API y conexiones externas
 ```
 
 ---

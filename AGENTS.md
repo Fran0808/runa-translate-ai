@@ -28,22 +28,22 @@ Este archivo define las directrices del proyecto, la arquitectura de referencia,
 ```text
 runa-translate-ai/
 ├── AGENTS.md                # Este archivo de reglas
-├── apps/
-│   ├── api/                 # Backend en Python (FastAPI)
-│   │   ├── main.py          # Punto de entrada
-│   │   ├── core/            # Configuración, seguridad y conexión a DB
-│   │   ├── models/          # Modelos de Pydantic y esquemas de MongoDB
-│   │   ├── routers/         # Endpoints (auth, translation, voice, admin)
-│   │   ├── services/        # Lógica de traducción e IA (NLLB, OpenAI, Whisper)
-│   │   └── requirements.txt # Dependencias de Python
-│   └── web/                 # Frontend Web (React + TypeScript con Vite)
-│       ├── index.html       # Entrada de la web
-│       ├── src/
-│       │   ├── components/  # Componentes reutilizables de UI (Premium UI)
-│       │   ├── pages/       # Páginas/Pantallas (Traducción, Historial, Estadísticas, Login)
-│       │   ├── services/    # Clientes de API (fetch a FastAPI, Firebase Auth)
-│       │   └── hooks/       # Custom hooks
-│       └── package.json
+├── package.json             # Atajos de ejecución del monorepo
+├── api/                     # Backend en Python (FastAPI)
+│   ├── main.py              # Punto de entrada
+│   ├── core/                # Configuración, seguridad y conexión a DB
+│   ├── models/              # Modelos de Pydantic y esquemas de MongoDB
+│   ├── routers/             # Endpoints (auth, translation, voice, admin)
+│   ├── services/            # Lógica de traducción e IA (NLLB, OpenAI, Whisper)
+│   └── requirements.txt     # Dependencias de Python
+└── web/                     # Frontend Web (React + TypeScript con Vite)
+    ├── index.html           # Entrada de la web
+    ├── src/
+    │   ├── components/      # Componentes reutilizables de UI (Premium UI)
+    │   ├── pages/           # Páginas/Pantallas (Traducción, Historial, Estadísticas, Login)
+    │   ├── services/        # Clientes de API (fetch a FastAPI, Firebase Auth)
+    │   └── hooks/           # Custom hooks
+    └── package.json
 ```
 
 ---
@@ -125,16 +125,15 @@ Todos los endpoints deben estar bajo el prefijo `/api/v1`.
 
 ---
 
-## 5. Estrategia
+## 5. Estrategia de IA
 
-Dado el alcance del proyecto, el desarrollo de modelos de traducción desde cero es complejo. Se aplicará una estrategia híbrida:
+Dado el alcance del proyecto, el desarrollo de modelos de traducción desde cero es complejo. Se aplicará una estrategia de IA 100% gratuita y alineada con los requerimientos del PDF:
 
 1. **Traducción de Texto (Español <-> Quechua / Aimara)**:
-   - **Opción Principal (Local/Open Source)**: Utilizar el modelo **Meta NLLB-200 (No Language Left Behind)** mediante la librería `transformers` de Hugging Face. El modelo `facebook/nllb-200-distilled-600M` es ligero, soporta Quechua (`quy_Latn` / `quz_Latn`) y Aimara (`ayr_Latn`), y corre bien en CPU/GPU locales.
-   - **Opción Secundaria (API Cloud)**: Usar la API de **OpenAI (GPT-4o)** con prompts estructurados (System Prompts con glosarios de ayuda) para traducción y corrección contextual.
+   - **Motor Principal (Local)**: Carga y ejecución local del modelo **Meta NLLB-200** (`facebook/nllb-200-distilled-600M`) utilizando la librería de Python `transformers` y `torch` (PyTorch) en el servidor backend (ejecución por CPU). Esta solución es 100% offline, no requiere tokens de API, y funciona de manera independiente sin verse afectada por filtros DNS.
 2. **Reconocimiento de Voz (ASR)**:
-   - **Whisper de OpenAI** (API o local). Whisper es excelente para Español y tiene capacidades básicas de reconocimiento de Quechua.
+   - **Opción Principal**: Integración del modelo **Whisper** de OpenAI para la transcripción de voz a texto de forma gratuita (consumido por API de Hugging Face o de forma local si persisten bloqueos de red).
 3. **Síntesis de Voz (TTS)**:
-   - Utilizar APIs como **Google Cloud Text-to-Speech** (que soporta Español nativo y Quechua en algunas configuraciones) o la API de síntesis de voz nativa del navegador (**Web Speech API**) para una reproducción local rápida y sin costo en la web.
+   - **Nativo del Navegador**: Utilizar la API de síntesis de voz nativa del navegador (**Web Speech API**) desde el frontend para reproducir la voz de forma local y 100% gratuita.
 
 
