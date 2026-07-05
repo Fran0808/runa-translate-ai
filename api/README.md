@@ -43,6 +43,24 @@ Para ver las instrucciones de instalación del entorno virtual y los comandos de
 
 ---
 
+## Verificación de la Instalación
+
+Una vez configurado el entorno virtual e instaladas las dependencias, puedes verificar de forma independiente los dos pilares del backend ejecutando los siguientes scripts de diagnóstico desde la raíz del proyecto:
+
+### 1. Verificar Conexión a la Base de Datos (MongoDB Atlas)
+Este script comprueba si tu archivo `.env` está bien configurado y si la base de datos en la nube está activa y accesible:
+```powershell
+.\api\.venv\Scripts\python.exe api/verify_mongodb.py
+```
+
+### 2. Verificar Modelo de Traducción (Local NLLB-200)
+Este script verifica que las dependencias de inteligencia artificial (PyTorch/Transformers) estén bien instaladas y realiza una traducción real de prueba a Quechua y Aimara en tu procesador local:
+```powershell
+.\api\.venv\Scripts\python.exe api/verify_translation.py
+```
+
+---
+
 ## Estructura de Carpetas
 
 * `main.py`: Punto de entrada que inicializa FastAPI y configura CORS.

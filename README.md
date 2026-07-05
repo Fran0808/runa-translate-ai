@@ -99,3 +99,15 @@ Si prefiere ejecutarlos en terminales independientes para ver los logs por separ
     npm run web
     ```
     La aplicación web estará disponible en `http://localhost:5173`.
+
+### 3. Verificar el correcto funcionamiento
+Para validar la instalación y configuración de forma aislada, el backend cuenta con dos scripts de autodiagnóstico que se pueden ejecutar desde la raíz:
+
+*   **Verificar Base de Datos (MongoDB Atlas)**:
+    ```powershell
+    .\api\.venv\Scripts\python.exe api/verify_mongodb.py
+    ```
+*   **Verificar Inteligencia Artificial (Traducción Local NLLB-200)**:
+    ```powershell
+    .\api\.venv\Scripts\python.exe api/verify_translation.py
+    ```
