@@ -37,7 +37,7 @@ El servidor requiere credenciales seguras para comunicarse con la base de datos 
 ---
 
 ### Paso 2: Crear el Entorno Virtual de Python
-Desde la carpeta `api/`, crea un entorno virtual aislado para instalar los paquetes requeridos sin afectar a tu sistema global:
+Asegúrate de que tu terminal esté dentro de la carpeta `api/` (si cerraste la terminal, ejecuta `cd api` de nuevo). Luego crea el entorno virtual:
 ```powershell
 python -m venv .venv
 ```
@@ -45,9 +45,9 @@ python -m venv .venv
 ---
 
 ### Paso 3: Instalar las Dependencias y Librerías de IA
-Instala las librerías del servidor y los motores locales de Inteligencia Artificial (PyTorch, Transformers y SentencePiece) en tu entorno virtual:
+Instala las librerías del servidor y los motores locales de Inteligencia Artificial (PyTorch, Transformers y SentencePiece) en tu entorno virtual. Este paso puede tardar varios minutos por el tamaño de PyTorch:
 ```powershell
-.venv\Scripts\pip.exe install -r requirements.txt
+.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
 ---
