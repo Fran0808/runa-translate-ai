@@ -1,0 +1,11 @@
+{
+  "name": "runa-translate-monorepo",
+  "version": "1.0.0",
+  "description": "Monorepo para RunaTranslate (Traductor de Lenguas Regionales)",
+  "private": true,
+  "scripts": {
+    "api": "apps\\api\\.venv\\Scripts\\uvicorn main:app --app-dir apps/api --reload --port 8000",
+    "web": "npm run dev --prefix apps/web",
+    "dev": "npx -y concurrently \"npm run api\" \"npm run web\""
+  }
+}

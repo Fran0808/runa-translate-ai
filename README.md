@@ -77,32 +77,25 @@ runa-translate-ai/
 
 ## Guía de Ejecución
 
-Para iniciar y probar el proyecto de manera local, siga las siguientes instrucciones en terminales independientes:
+Para iniciar y probar el proyecto de manera local, puede ejecutar los comandos directamente desde la **carpeta raíz** del proyecto (sin necesidad de cambiar de directorio):
 
-### 1. Servidor Backend (API)
-1. Navegue a la carpeta de la API:
-   ```bash
-   cd apps/api
-   ```
-2. Inicie el servidor utilizando el entorno virtual:
-   * En Windows (PowerShell):
-     ```powershell
-     .venv\Scripts\uvicorn main:app --reload --port 8000
-     ```
-   * En macOS/Linux (Bash):
-     ```bash
-     .venv/bin/uvicorn main:app --reload --port 8000
-     ```
-   *(Nota: Alternativamente, puede activar el entorno virtual ejecutando `.venv\Scripts\activate` en Windows o `source .venv/bin/activate` en macOS/Linux y luego correr directamente `uvicorn main:app --reload --port 8000`)*
-La API estará disponible en `http://localhost:8000`. Puede acceder a la documentación interactiva (Swagger UI) en `http://localhost:8000/docs`.
+### 1. Iniciar ambos módulos en paralelo
+Para levantar el servidor backend (API) y la aplicación web (Frontend) al mismo tiempo en una única terminal:
+```bash
+npm run dev
+```
 
-### 2. Frontend Web
-1. Navegue a la carpeta de la aplicación web:
-   ```bash
-   cd apps/web
-   ```
-2. Inicie el servidor de desarrollo de Vite:
-   ```bash
-   npm run dev
-   ```
-La aplicación web estará disponible en `http://localhost:5173`.
+### 2. Iniciar módulos de forma independiente
+Si prefiere ejecutarlos en terminales independientes para ver los logs por separado:
+
+*   **Iniciar el Backend (API)**:
+    ```bash
+    npm run api
+    ```
+    La API estará disponible en `http://localhost:8000`. Puedes acceder a la documentación interactiva (Swagger UI) en `http://localhost:8000/docs`.
+
+*   **Iniciar el Frontend (Web)**:
+    ```bash
+    npm run web
+    ```
+    La aplicación web estará disponible en `http://localhost:5173`.
