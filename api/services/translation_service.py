@@ -1,7 +1,6 @@
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import torch
 
-# Language code mapping from simple frontend codes to FLORES-200 codes required by NLLB-200
 LANGUAGE_CODES = {
     "es": "spa_Latn",
     "qu": "quy_Latn",
