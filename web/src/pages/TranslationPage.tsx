@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeftRight, Copy, Volume2, Trash2, Check } from 'lucide-react';
+import { ArrowLeftRight, Copy, Volume2, Trash2, Check, Loader2 } from 'lucide-react';
 
 type LangCode = 'es' | 'qu' | 'ay';
 
@@ -9,23 +9,62 @@ const LANGUAGES: { code: LangCode; label: string }[] = [
   { code: 'ay', label: 'Aimara' },
 ];
 
+const API_URL = 'http://localhost:8000';
 const CHAR_LIMIT = 1000;
 
 export default function TranslationPage() {
   const [sourceLang, setSourceLang] = useState<LangCode>('es');
   const [targetLang, setTargetLang] = useState<LangCode>('qu');
   const [sourceText, setSourceText] = useState('');
-  const [translatedText] = useState('');
+  const [translatedText, setTranslatedText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
 
   const handleSwap = () => {
     setSourceLang(targetLang);
     setTargetLang(sourceLang);
+    setSourceText(translatedText);
+    setTranslatedText(sourceText);
+  };
+
+  const handleTranslate = async () => {
+    if (!sourceText.trim() || isLoading) return;
+    setIsLoading(true);
+    setError('');
+    setTranslatedText('');
+    try {
+      const res = await fetch(`${API_URL}/api/v1/translate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: sourceText, source_lang: sourceLang, target_lang: targetLang }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setTranslatedText(data.data.translated_text);
+      } else {
+        setError('Error al traducir. Intenta de nuevo.');
+      }
+    } catch {
+      setError('No se pudo conectar con el servidor. Asegúrate de que el backend esté activo.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCopy = () => {
+    if (!translatedText) return;
+    navigator.clipboard.writeText(translatedText);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleSpeak = () => {
+    if (!translatedText) return;
+    window.speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(translatedText);
+    utt.lang = targetLang === 'es' ? 'es-ES' : 'es-PE';
+    window.speechSynthesis.speak(utt);
   };
 
   return (
@@ -82,6 +121,9 @@ export default function TranslationPage() {
             onChange={e => {
               if (e.target.value.length <= CHAR_LIMIT) setSourceText(e.target.value);
             }}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleTranslate();
+            }}
             placeholder="Escribe o pega el texto aquí..."
             className="w-full flex-1 bg-transparent border-0 resize-none text-gray-200 placeholder-gray-600 focus:ring-0 focus:outline-none text-base leading-relaxed"
           />
@@ -101,6 +143,7 @@ export default function TranslationPage() {
             <span className="text-brand-teal font-semibold text-sm">Traducción</span>
             <div className="flex items-center gap-2">
               <button
+                onClick={handleSpeak}
                 disabled={!translatedText}
                 title="Escuchar"
                 className="text-gray-500 hover:text-brand-teal disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
@@ -118,7 +161,14 @@ export default function TranslationPage() {
             </div>
           </div>
           <div className="flex-1">
-            {translatedText ? (
+            {isLoading ? (
+              <div className="flex items-center gap-2 text-gray-500 text-sm">
+                <Loader2 className="w-4 h-4 animate-spin text-brand-teal" />
+                Traduciendo con NLLB-200…
+              </div>
+            ) : error ? (
+              <p className="text-yellow-500/80 text-sm">{error}</p>
+            ) : translatedText ? (
               <p className="text-gray-200 text-base leading-relaxed">{translatedText}</p>
             ) : (
               <p className="text-gray-600 text-sm italic">La traducción aparecerá aquí...</p>
@@ -128,10 +178,11 @@ export default function TranslationPage() {
       </div>
       
       <button
-        disabled={!sourceText.trim()}
+        onClick={handleTranslate}
+        disabled={!sourceText.trim() || isLoading}
         className="w-full max-w-md py-3.5 rounded-2xl bg-brand-teal text-obsidian font-bold text-sm tracking-wide hover:bg-teal-400 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        Traducir
+        {isLoading ? 'Traduciendo...' : 'Traducir'}
       </button>
 
       <p className="mt-3 text-xs text-gray-600">Ctrl + Enter para traducir</p>

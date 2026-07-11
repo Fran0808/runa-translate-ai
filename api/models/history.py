@@ -1,11 +1,11 @@
-from pydantic import BaseModel, Field
-from typing import Optional
 from datetime import datetime
+
+from pydantic import BaseModel
 
 
 class HistoryRecord(BaseModel):
     """Schema for a history record returned to the client."""
-    id: Optional[str] = None
+    id: str | None = None
     sourceText: str
     translatedText: str
     sourceLanguage: str
