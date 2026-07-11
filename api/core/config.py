@@ -1,8 +1,10 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-# Cargar las variables de entorno desde el archivo .env
-load_dotenv()
+base_dir = Path(__file__).resolve().parent.parent
+env_path = base_dir / ".env"
+load_dotenv(dotenv_path=env_path)
 
 class Settings:
     PROJECT_NAME: str = "RunaTranslate API"
