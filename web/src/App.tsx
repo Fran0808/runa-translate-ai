@@ -1,23 +1,30 @@
-import './App.css'
+import { useState } from 'react';
+import Navbar from './components/Navbar';
+import TranslationPage from './pages/TranslationPage';
+import HistoryPage from './pages/HistoryPage';
+import AdminStatsPage from './pages/AdminStatsPage';
 
 function App() {
+  const [activeTab, setActiveTab] = useState<'translate' | 'history' | 'stats'>('translate');
+
   return (
-    <div className="min-h-screen bg-obsidian text-gray-100 flex flex-col items-center justify-center p-6">
-      <header className="text-center max-w-xl">
-        <h1 className="text-5xl font-extrabold text-brand-teal mb-4 tracking-tight drop-shadow-md">
-          RunaTranslate
-        </h1>
-        <p className="text-lg text-gray-400 font-medium">
-          Traductor Inteligente de Lenguas Regionales
-        </p>
-        <div className="mt-8 p-6 bg-dark-panel/50 rounded-2xl border border-gray-850 backdrop-blur-md shadow-2xl">
-          <p className="text-brand-gold font-semibold">
-            Tailwind funcionando
-          </p>
-        </div>
-      </header>
+    <div className="min-h-screen bg-obsidian text-gray-100 flex flex-col">
+      {/* Navigation Bar */}
+      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col">
+        {activeTab === 'translate' && <TranslationPage />}
+        {activeTab === 'history' && <HistoryPage />}
+        {activeTab === 'stats' && <AdminStatsPage />}
+      </main>
+
+      {/* Footer */}
+      <footer className="w-full text-center py-6 border-t border-gray-800 text-xs text-gray-500">
+        RunaTranslate © {new Date().getFullYear()} — Diseñado para la preservación de lenguas regionales
+      </footer>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
