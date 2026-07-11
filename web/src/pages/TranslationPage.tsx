@@ -12,11 +12,27 @@ const LANGUAGES: { code: LangCode; label: string }[] = [
 const API_URL = 'http://localhost:8000';
 const CHAR_LIMIT = 1000;
 
-export default function TranslationPage() {
-  const [sourceLang, setSourceLang] = useState<LangCode>('es');
-  const [targetLang, setTargetLang] = useState<LangCode>('qu');
-  const [sourceText, setSourceText] = useState('');
-  const [translatedText, setTranslatedText] = useState('');
+interface TranslationPageProps {
+  sourceLang: LangCode;
+  setSourceLang: (lang: LangCode) => void;
+  targetLang: LangCode;
+  setTargetLang: (lang: LangCode) => void;
+  sourceText: string;
+  setSourceText: (text: string) => void;
+  translatedText: string;
+  setTranslatedText: (text: string) => void;
+}
+
+export default function TranslationPage({
+  sourceLang,
+  setSourceLang,
+  targetLang,
+  setTargetLang,
+  sourceText,
+  setSourceText,
+  translatedText,
+  setTranslatedText,
+}: TranslationPageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
