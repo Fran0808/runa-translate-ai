@@ -65,17 +65,17 @@ class TranslationService:
         nllb_source = LANGUAGE_CODES[source_lang]
         nllb_target = LANGUAGE_CODES[target_lang]
 
-        # Tokenize the input text with the source language
         self.tokenizer.src_lang = nllb_source
         inputs = self.tokenizer(text, return_tensors="pt", padding=True, truncation=True, max_length=512)
 
-        # Generate translated tokens
+        import torch  # noqa: PLC0415
         with torch.no_grad():
             translated_tokens = self.model.generate(
                 **inputs,
                 forced_bos_token_id=self.tokenizer.convert_tokens_to_ids(nllb_target),
                 max_length=512,
                 num_beams=4,
+                no_repeat_ngram_size=3,
                 early_stopping=True,
             )
 

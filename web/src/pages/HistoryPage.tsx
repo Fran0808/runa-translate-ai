@@ -1,14 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Clock, ArrowRight, RefreshCw, Loader2, Play } from 'lucide-react';
-
-type TranslationRecord = {
-  sourceText: string;
-  translatedText: string;
-  sourceLanguage: 'es' | 'qu' | 'ay';
-  targetLanguage: 'es' | 'qu' | 'ay';
-  mode: string;
-  timestamp: string;
-};
+import { getHistory } from '../services/api';
+import type { TranslationRecord } from '../services/api';
 
 interface HistoryPageProps {
   onSelectRecord: (
@@ -34,15 +27,10 @@ export default function HistoryPage({ onSelectRecord }: HistoryPageProps) {
     setIsLoading(true);
     setError('');
     try {
-      const res = await fetch('http://localhost:8000/api/v1/history');
-      const data = await res.json();
-      if (data.success) {
-        setRecords(data.data);
-      } else {
-        setError('Error al obtener el historial.');
-      }
-    } catch {
-      setError('No se pudo conectar al servidor. Asegúrate de que el backend esté activo.');
+      const data = await getHistory();
+      setRecords(data);
+    } catch (err: any) {
+      setError(err.message || 'No se pudo conectar al servidor. Asegúrate de que el backend esté activo.');
     } finally {
       setIsLoading(false);
     }
@@ -89,16 +77,16 @@ export default function HistoryPage({ onSelectRecord }: HistoryPageProps) {
       </div>
 
       {isLoading ? (
-        <div className="w-full flex-1 flex flex-col items-center justify-center min-h-[300px]">
+        <div className="w-full flex-1 flex flex-col items-center justify-center min-h-75">
           <Loader2 className="w-10 h-10 animate-spin text-brand-teal mb-4" />
           <p className="text-gray-400 text-sm">Cargando historial...</p>
         </div>
       ) : error ? (
-        <div className="w-full bg-dark-panel/20 border border-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center min-h-[300px]">
+        <div className="w-full bg-dark-panel/20 border border-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center min-h-75">
           <p className="text-yellow-500/80 text-sm text-center">{error}</p>
         </div>
       ) : records.length === 0 ? (
-        <div className="w-full bg-dark-panel/20 border border-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center min-h-[300px]">
+        <div className="w-full bg-dark-panel/20 border border-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center min-h-75">
           <div className="bg-gray-900/50 p-4 rounded-full border border-gray-800 mb-4">
             <Clock className="w-10 h-10 text-brand-teal" />
           </div>

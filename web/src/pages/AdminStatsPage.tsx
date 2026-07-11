@@ -1,24 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BarChart3, RefreshCw, TrendingUp, Type, Mic, Loader2 } from 'lucide-react';
-
-type LanguageStat = {
-  _id: {
-    source: string;
-    target: string;
-  };
-  count: number;
-};
-
-type ModeStat = {
-  _id: string;
-  count: number;
-};
-
-type StatsData = {
-  total_translations: number;
-  by_language: LanguageStat[];
-  by_mode: ModeStat[];
-};
+import { getAdminStats } from '../services/api';
+import type { StatsData } from '../services/api';
 
 const LANG_LABELS: Record<string, string> = {
   es: 'Español',
@@ -35,15 +18,10 @@ export default function AdminStatsPage() {
     setIsLoading(true);
     setError('');
     try {
-      const res = await fetch('http://localhost:8000/api/v1/admin/stats');
-      const data = await res.json();
-      if (data.success) {
-        setStats(data.data);
-      } else {
-        setError('Error al obtener las estadísticas.');
-      }
-    } catch {
-      setError('No se pudo conectar al servidor. Asegúrate de que el backend esté activo.');
+      const data = await getAdminStats();
+      setStats(data);
+    } catch (err: any) {
+      setError(err.message || 'No se pudo conectar al servidor. Asegúrate de que el backend esté activo.');
     } finally {
       setIsLoading(false);
     }
@@ -93,16 +71,16 @@ export default function AdminStatsPage() {
       </div>
 
       {isLoading ? (
-        <div className="w-full flex-1 flex flex-col items-center justify-center min-h-[300px]">
+        <div className="w-full flex-1 flex flex-col items-center justify-center min-h-75">
           <Loader2 className="w-10 h-10 animate-spin text-brand-teal mb-4" />
           <p className="text-gray-400 text-sm">Cargando estadísticas...</p>
         </div>
       ) : error ? (
-        <div className="w-full bg-dark-panel/20 border border-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center min-h-[300px]">
+        <div className="w-full bg-dark-panel/20 border border-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center min-h-75">
           <p className="text-yellow-500/80 text-sm text-center">{error}</p>
         </div>
       ) : !stats ? (
-        <div className="w-full bg-dark-panel/20 border border-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center min-h-[300px]">
+        <div className="w-full bg-dark-panel/20 border border-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center min-h-75">
           <p className="text-gray-400 text-sm">No hay datos disponibles.</p>
         </div>
       ) : (

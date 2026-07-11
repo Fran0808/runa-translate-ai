@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { ArrowLeftRight, Copy, Volume2, Trash2, Check, Loader2 } from 'lucide-react';
-
-type LangCode = 'es' | 'qu' | 'ay';
+import { translateText } from '../services/api';
+import type { LangCode } from '../services/api';
+import { speakText } from '../services/speech';
 
 const LANGUAGES: { code: LangCode; label: string }[] = [
   { code: 'es', label: 'Español' },
@@ -9,7 +10,6 @@ const LANGUAGES: { code: LangCode; label: string }[] = [
   { code: 'ay', label: 'Aimara' },
 ];
 
-const API_URL = 'http://localhost:8000';
 const CHAR_LIMIT = 1000;
 
 interface TranslationPageProps {
@@ -50,19 +50,10 @@ export default function TranslationPage({
     setError('');
     setTranslatedText('');
     try {
-      const res = await fetch(`${API_URL}/api/v1/translate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: sourceText, source_lang: sourceLang, target_lang: targetLang }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setTranslatedText(data.data.translated_text);
-      } else {
-        setError('Error al traducir. Intenta de nuevo.');
-      }
-    } catch {
-      setError('No se pudo conectar con el servidor. Asegúrate de que el backend esté activo.');
+      const translated = await translateText(sourceText, sourceLang, targetLang);
+      setTranslatedText(translated);
+    } catch (err: any) {
+      setError(err.message || 'No se pudo conectar con el servidor. Asegúrate de que el backend esté activo.');
     } finally {
       setIsLoading(false);
     }
@@ -76,11 +67,7 @@ export default function TranslationPage({
   };
 
   const handleSpeak = () => {
-    if (!translatedText) return;
-    window.speechSynthesis.cancel();
-    const utt = new SpeechSynthesisUtterance(translatedText);
-    utt.lang = targetLang === 'es' ? 'es-ES' : 'es-PE';
-    window.speechSynthesis.speak(utt);
+    speakText(translatedText, targetLang);
   };
 
   return (
@@ -127,7 +114,7 @@ export default function TranslationPage({
       
       <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
 
-        <div className="bg-dark-panel/40 border border-gray-800 rounded-2xl p-6 flex flex-col min-h-[280px]">
+        <div className="bg-dark-panel/40 border border-gray-800 rounded-2xl p-6 flex flex-col min-h-70">
           <div className="flex justify-between items-center mb-4 border-b border-gray-800/50 pb-3">
             <span className="text-brand-teal font-semibold text-sm">Texto original</span>
             <span className="text-xs text-gray-500">{sourceText.length}/{CHAR_LIMIT}</span>
@@ -154,7 +141,7 @@ export default function TranslationPage({
           )}
         </div>
         
-        <div className="bg-dark-panel/40 border border-gray-800 rounded-2xl p-6 flex flex-col min-h-[280px]">
+        <div className="bg-dark-panel/40 border border-gray-800 rounded-2xl p-6 flex flex-col min-h-70">
           <div className="flex justify-between items-center mb-4 border-b border-gray-800/50 pb-3">
             <span className="text-brand-teal font-semibold text-sm">Traducción</span>
             <div className="flex items-center gap-2">
