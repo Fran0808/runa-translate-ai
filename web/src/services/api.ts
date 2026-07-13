@@ -93,3 +93,4 @@ export async function getAdminStats(): Promise<StatsData> {
     throw new Error(data.error || 'Error al obtener las estadísticas');
   }
 }
+

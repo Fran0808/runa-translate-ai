@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ArrowLeftRight, Copy, Volume2, Trash2, Check, Loader2 } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { ArrowLeftRight, Copy, Volume2, Trash2, Check, Loader2, Mic } from 'lucide-react';
 import { translateText } from '../services/api';
 import type { LangCode } from '../services/api';
 import { speakText } from '../services/speech';
@@ -36,6 +36,65 @@ export default function TranslationPage({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  const handleToggleRecord = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setError('Tu navegador no soporta el reconocimiento de voz nativo. Por favor usa Google Chrome o Microsoft Edge.');
+      return;
+    }
+
+    if (isRecording) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsRecording(false);
+    } else {
+      setError('');
+      try {
+        const recognition = new SpeechRecognition();
+        recognitionRef.current = recognition;
+        
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'es-PE';
+
+        recognition.onstart = () => {
+          setIsRecording(true);
+        };
+
+        recognition.onerror = (event: any) => {
+          if (event.error === 'not-allowed') {
+            setError('Acceso al micrófono denegado. Permite el uso del micrófono en la configuración de tu navegador.');
+          } else {
+            setError(`Error de reconocimiento: ${event.error}`);
+          }
+          setIsRecording(false);
+        };
+
+        recognition.onend = () => {
+          setIsRecording(false);
+        };
+
+        recognition.onresult = (event: any) => {
+          const transcript = event.results[0][0].transcript;
+          if (transcript) {
+            setSourceText(transcript);
+          } else {
+            setError('No se pudo reconocer ninguna palabra.');
+          }
+        };
+
+        recognition.start();
+      } catch (err) {
+        setError('Error al iniciar el reconocimiento de voz.');
+        setIsRecording(false);
+      }
+    }
+  };
 
   const handleSwap = () => {
     setSourceLang(targetLang);
@@ -130,15 +189,30 @@ export default function TranslationPage({
             placeholder="Escribe o pega el texto aquí..."
             className="w-full flex-1 bg-transparent border-0 resize-none text-gray-200 placeholder-gray-600 focus:ring-0 focus:outline-none text-base leading-relaxed"
           />
-          {sourceText && (
+          {/* Action Row */}
+          <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-800/30">
             <button
-              onClick={() => setSourceText('')}
-              className="self-start mt-3 flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors cursor-pointer"
+              onClick={handleToggleRecord}
+              className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all cursor-pointer ${
+                isRecording
+                  ? 'bg-brand-gold/10 border-brand-gold text-brand-gold animate-pulse'
+                  : 'bg-transparent border-gray-700 text-gray-400 hover:text-brand-teal hover:border-brand-teal'
+              }`}
             >
-              <Trash2 className="w-3.5 h-3.5" />
-              Limpiar
+              <Mic className="w-3.5 h-3.5" />
+              {isRecording ? 'Detener grabación' : 'Grabar voz'}
             </button>
-          )}
+
+            {sourceText && (
+              <button
+                onClick={() => { setSourceText(''); setTranslatedText(''); setError(''); }}
+                className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Limpiar
+              </button>
+            )}
+          </div>
         </div>
         
         <div className="bg-dark-panel/40 border border-gray-800 rounded-2xl p-6 flex flex-col min-h-70">
