@@ -34,6 +34,13 @@ El servidor requiere credenciales seguras para comunicarse con la base de datos 
      4. Haz clic en **New token**, nómbralo `RunaTranslate`, dale el rol de **Read** (lectura) y haz clic en **Generate a token**.
      5. Copia la clave resultante (inicia con `hf_...`) y pégala en tu `.env` en la variable `HF_API_TOKEN`.
 
+   * **Obtener la API Key Gratuita de Google Gemini (Opcional - Recomendado)**:
+     * *Nota*: Al configurar esta clave activarás el **Módulo Inteligente de Corrección Contextual**, el cual pule las traducciones locales del modelo NLLB-200 para evitar modismos erróneos o desvíos al inglés. Es 100% gratuito.
+     1. Regístrate en **[Google AI Studio](https://aistudio.google.com/)** con tu cuenta de Google.
+     2. Haz clic en el botón principal **"Create API Key"** (Crear clave de API).
+     3. Selecciona tu proyecto o crea uno nuevo y haz clic en **"Create API Key in new project"**.
+     4. Copia la clave de API generada (inicia con `AIzaSy...`) y pégala en tu archivo `.env` en la variable `GEMINI_API_KEY`.
+
 ---
 
 ### Paso 2: Crear el Entorno Virtual de Python
@@ -95,3 +102,27 @@ Con el servidor encendido:
 * `models/`: Esquemas de validación de datos con Pydantic.
 * `routers/`: Rutas y endpoints de la API (traducción, voz, administración).
 * `services/`: Integraciones con motores de IA (NLLB local, Whisper).
+
+---
+
+## Ejemplos de Prueba Verificados (Offline / Modelo Local)
+
+Para comprobar el correcto funcionamiento del modelo de traducción local **NLLB-200** (offline, sin necesidad de claves de API externas), puedes probar con este listado de oraciones cortas y estructuradas que han sido verificadas en el entorno local:
+
+### 🇪🇸 Español ➜ 🏔️ Quechua
+*   `Buenos días, ¿cómo estás?` ➜ `Alli p'unchay. ¿Imaynatan kanki?`
+*   `Mi nombre es Juan.` ➜ `Noqaqa Juan sutin.`
+*   `Yo vivo aquí.` ➜ `Kaypi tiyakuni.`
+*   `El sol es grande.` ➜ `Intiqa hatunmi.`
+*   `Tú eres mi amigo.` ➜ `Qammi amistadniy kanki.`
+*   `Me gusta cantar.` ➜ `Noqaqa takiyta munani.`
+*   `Mi pueblo es hermoso.` ➜ `Llaqtaqa sumaqmi.`
+
+### 🏔️ Quechua ➜ 🇪🇸 Español
+*   `Alli p'unchay. ¿Imaynatan kanki?` ➜ `Buen día. ¿Cómo estás?`
+*   `Imataq sutiyki?` ➜ `¿Cómo te llamas?`
+*   `Kaypi tiyakuni.` ➜ `Aquí es donde vivo.`
+*   `Intiqa hatunmi.` ➜ `El sol es grande.`
+*   `Qammi amistadniy kanki.` ➜ `Tú eres mi amigo.`
+*   `Noqa allin kani.` ➜ `Estoy bien.`
+*   `Wasiyqa sumaqmi.` ➜ `Mi casa está bien.`

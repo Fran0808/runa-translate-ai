@@ -85,9 +85,6 @@ Para levantar el servidor backend (API) y la aplicación web (Frontend) al mismo
 npm run dev
 ```
 
-### 2. Iniciar módulos de forma independiente
-Si prefiere ejecutarlos en terminales independientes para ver los logs por separado:
-
 *   **Iniciar el Backend (API)**:
     ```bash
     npm run api
@@ -99,3 +96,48 @@ Si prefiere ejecutarlos en terminales independientes para ver los logs por separ
     npm run web
     ```
     La aplicación web estará disponible en `http://localhost:5173`.
+
+---
+
+## Ejemplos de Prueba Verificados (Offline / Modelo Local)
+
+Para comprobar el correcto funcionamiento del modelo de traducción local **NLLB-200** (offline, sin necesidad de claves de API externas), puedes probar con este listado de oraciones cortas y estructuradas que han sido verificadas en el entorno local:
+
+### 🇪🇸 Español ➜ 🏔️ Quechua
+*   `Buenos días, ¿cómo estás?` ➜ `Alli p'unchay. ¿Imaynatan kanki?`
+*   `Mi nombre es Juan.` ➜ `Noqaqa Juan sutin.`
+*   `Yo vivo aquí.` ➜ `Kaypi tiyakuni.`
+*   `El sol es grande.` ➜ `Intiqa hatunmi.`
+*   `Tú eres mi amigo.` ➜ `Qammi amistadniy kanki.`
+*   `Me gusta cantar.` ➜ `Noqaqa takiyta munani.`
+*   `Mi pueblo es hermoso.` ➜ `Llaqtaqa sumaqmi.`
+
+### 🏔️ Quechua ➜ 🇪🇸 Español
+*   `Alli p'unchay. ¿Imaynatan kanki?` ➜ `Buen día. ¿Cómo estás?`
+*   `Imataq sutiyki?` ➜ `¿Cómo te llamas?`
+*   `Kaypi tiyakuni.` ➜ `Aquí es donde vivo.`
+*   `Intiqa hatunmi.` ➜ `El sol es grande.`
+*   `Qammi amistadniy kanki.` ➜ `Tú eres mi amigo.`
+*   `Noqa allin kani.` ➜ `Estoy bien.`
+*   `Wasiyqa sumaqmi.` ➜ `Mi casa está bien.`
+
+---
+
+## Módulo Inteligente: Configuración de Google Gemini (Opcional - Recomendado)
+
+Para corregir los desvíos lingüísticos del modelo local de traducción (NLLB-200) y obtener traducciones refinadas y adaptadas culturalmente, puedes activar el **Módulo de Corrección Contextual** de forma 100% gratuita utilizando la API de Google Gemini:
+
+### Cómo obtener la API Key Gratuita de Gemini:
+1. Regístrate de forma gratuita en **[Google AI Studio](https://aistudio.google.com/)** con tu cuenta de Google.
+2. Haz clic en el botón principal **"Create API Key"** (Crear clave de API).
+3. Selecciona tu proyecto o crea uno nuevo y haz clic en **"Create API Key in new project"**.
+4. Copia la clave de API generada (una cadena de caracteres que inicia con `AIzaSy...`). *No requiere tarjeta de crédito ni facturación.*
+
+### Configuración en el proyecto:
+Abre el archivo `.env` ubicado en la carpeta `api/` y añade la clave de API en la variable `GEMINI_API_KEY`:
+
+```env
+GEMINI_API_KEY=AIzaSyTuClaveGeneradaAqui...
+```
+
+Al levantar el proyecto, el backend detectará la clave y aplicará automáticamente el filtro corrector de **Gemini 1.5 Flash** para optimizar el resultado del traductor. Si no hay internet o no configuras la clave, el traductor seguirá funcionando con el modelo NLLB-200 local como respaldo seguro.
