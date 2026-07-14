@@ -83,6 +83,58 @@ class TranslationService:
         result = self.tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)
         return result[0]
 
+    def refine_translation(self, text: str, draft: str, source_lang: str, target_lang: str) -> tuple[str, bool]:
+        """
+        Refine the translation draft using Google Gemini 1.5 Flash API if configured.
+        Returns a tuple of (refined_text, context_corrected).
+        """
+        from core.config import settings
+        import requests
+
+        if not settings.GEMINI_API_KEY:
+            return draft, False
+
+        lang_names = {"es": "Español", "qu": "Quechua", "ay": "Aimara"}
+        source_name = lang_names.get(source_lang, source_lang)
+        target_name = lang_names.get(target_lang, target_lang)
+
+        prompt = (
+            f"Eres un experto lingüista y traductor de lenguas andinas. Corrige y perfecciona la siguiente traducción al {target_name} de la frase original en {source_name}:\n\n"
+            f"Frase original: \"{text}\"\n"
+            f"Traducción borrador: \"{draft}\"\n\n"
+            f"Instrucciones importantes:\n"
+            f"1. La traducción borrador puede contener errores, palabras no traducidas o incluso estar en inglés (ej. \"Welcome\"). Debes corregir eso y traducirlo completamente al {target_name}.\n"
+            f"2. Mantén el significado original de la frase.\n"
+            f"3. Devuelve únicamente la traducción final corregida en {target_name}, sin explicaciones, sin introducciones y sin comillas."
+        )
+
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={settings.GEMINI_API_KEY}"
+        headers = {"Content-Type": "application/json"}
+        payload = {
+            "contents": [{
+                "parts": [{
+                    "text": prompt
+                }]
+            }]
+        }
+
+        try:
+            response = requests.post(url, headers=headers, json=payload, timeout=15)
+            if response.status_code == 200:
+                data = response.json()
+                refined_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+                if refined_text.startswith('"') and refined_text.endswith('"'):
+                    refined_text = refined_text[1:-1].strip()
+                elif refined_text.startswith("'") and refined_text.endswith("'"):
+                    refined_text = refined_text[1:-1].strip()
+                return refined_text, True
+            else:
+                print(f"[!] Advertencia: La API de Gemini respondió con código {response.status_code}. Detalle: {response.text}")
+                return draft, False
+        except Exception as e:
+            print(f"[!] Advertencia: Error al conectar con la API de Gemini: {e}")
+            return draft, False
+
 
 # Global singleton instance used across the entire application
 translation_service = TranslationService()

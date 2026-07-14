@@ -38,4 +38,5 @@ class TranslationRecord(BaseModel):
     sourceLanguage: str
     targetLanguage: str
     mode: str = "text"
+    context_corrected: bool = False
     timestamp: datetime = Field(default_factory=datetime.utcnow)

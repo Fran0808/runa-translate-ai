@@ -23,8 +23,15 @@ def translate_text(request: TranslationRequest):
     - **target_lang**: Target language code: `es` (Español), `qu` (Quechua), `ay` (Aimara).
     """
     try:
-        translated_text = translation_service.translate(
+        draft_text = translation_service.translate(
             text=request.text,
+            source_lang=request.source_lang,
+            target_lang=request.target_lang,
+        )
+        # Apply Gemini context correction if online/configured
+        translated_text, context_corrected = translation_service.refine_translation(
+            text=request.text,
+            draft=draft_text,
             source_lang=request.source_lang,
             target_lang=request.target_lang,
         )
@@ -32,7 +39,7 @@ def translate_text(request: TranslationRequest):
         raise HTTPException(status_code=400, detail={"success": False, "error": str(e)})
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail={"success": False, "error": str(e)})
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail={"success": False, "error": "Error interno del servidor al traducir."})
 
     # Save translation record to MongoDB if the database is available
@@ -45,6 +52,7 @@ def translate_text(request: TranslationRequest):
                 sourceLanguage=request.source_lang,
                 targetLanguage=request.target_lang,
                 mode="text",
+                context_corrected=context_corrected,
                 timestamp=datetime.utcnow(),
             )
             db["translations"].insert_one(record.model_dump())
@@ -58,5 +66,6 @@ def translate_text(request: TranslationRequest):
             "translated_text": translated_text,
             "source_lang": request.source_lang,
             "target_lang": request.target_lang,
+            "context_corrected": context_corrected,
         }
     )

@@ -11,4 +11,5 @@ class HistoryRecord(BaseModel):
     sourceLanguage: str
     targetLanguage: str
     mode: str
+    context_corrected: bool = False
     timestamp: datetime
