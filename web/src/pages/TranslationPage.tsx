@@ -21,6 +21,8 @@ interface TranslationPageProps {
   setSourceText: (text: string) => void;
   translatedText: string;
   setTranslatedText: (text: string) => void;
+  contextCorrected: boolean;
+  setContextCorrected: (val: boolean) => void;
 }
 
 export default function TranslationPage({
@@ -32,6 +34,8 @@ export default function TranslationPage({
   setSourceText,
   translatedText,
   setTranslatedText,
+  contextCorrected,
+  setContextCorrected,
 }: TranslationPageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -101,6 +105,7 @@ export default function TranslationPage({
     setTargetLang(sourceLang);
     setSourceText(translatedText);
     setTranslatedText(sourceText);
+    setContextCorrected(false);
   };
 
   const handleTranslate = async () => {
@@ -108,9 +113,11 @@ export default function TranslationPage({
     setIsLoading(true);
     setError('');
     setTranslatedText('');
+    setContextCorrected(false);
     try {
-      const translated = await translateText(sourceText, sourceLang, targetLang);
-      setTranslatedText(translated);
+      const res = await translateText(sourceText, sourceLang, targetLang);
+      setTranslatedText(res.translatedText);
+      setContextCorrected(res.contextCorrected);
     } catch (err: any) {
       setError(err.message || 'No se pudo conectar con el servidor. Asegúrate de que el backend esté activo.');
     } finally {
@@ -181,7 +188,10 @@ export default function TranslationPage({
           <textarea
             value={sourceText}
             onChange={e => {
-              if (e.target.value.length <= CHAR_LIMIT) setSourceText(e.target.value);
+              if (e.target.value.length <= CHAR_LIMIT) {
+                setSourceText(e.target.value);
+                setContextCorrected(false);
+              }
             }}
             onKeyDown={e => {
               if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleTranslate();
@@ -205,7 +215,7 @@ export default function TranslationPage({
 
             {sourceText && (
               <button
-                onClick={() => { setSourceText(''); setTranslatedText(''); setError(''); }}
+                onClick={() => { setSourceText(''); setTranslatedText(''); setError(''); setContextCorrected(false); }}
                 className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors cursor-pointer"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -217,7 +227,14 @@ export default function TranslationPage({
         
         <div className="bg-dark-panel/40 border border-gray-800 rounded-2xl p-6 flex flex-col min-h-70">
           <div className="flex justify-between items-center mb-4 border-b border-gray-800/50 pb-3">
-            <span className="text-brand-teal font-semibold text-sm">Traducción</span>
+            <div className="flex items-center gap-2">
+              <span className="text-brand-teal font-semibold text-sm">Traducción</span>
+              {contextCorrected && (
+                <span className="text-[10px] bg-brand-teal/10 text-brand-teal border border-brand-teal/20 px-2 py-0.5 rounded-lg font-semibold animate-pulse">
+                  Traducción verificada
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={handleSpeak}

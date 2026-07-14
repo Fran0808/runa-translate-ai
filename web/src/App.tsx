@@ -10,6 +10,7 @@ function App() {
   const [targetLang, setTargetLang] = useState<'es' | 'qu' | 'ay'>('qu');
   const [sourceText, setSourceText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
+  const [contextCorrected, setContextCorrected] = useState(false);
 
   return (
     <div className="min-h-screen bg-obsidian text-gray-100 flex flex-col">
@@ -28,15 +29,18 @@ function App() {
             setSourceText={setSourceText}
             translatedText={translatedText}
             setTranslatedText={setTranslatedText}
+            contextCorrected={contextCorrected}
+            setContextCorrected={setContextCorrected}
           />
         )}
         {activeTab === 'history' && (
           <HistoryPage
-            onSelectRecord={(srcText, transText, srcLang, tgtLang) => {
+            onSelectRecord={(srcText, transText, srcLang, tgtLang, isCorrected) => {
               setSourceText(srcText);
               setTranslatedText(transText);
               setSourceLang(srcLang);
               setTargetLang(tgtLang);
+              setContextCorrected(isCorrected);
               setActiveTab('translate');
             }}
           />

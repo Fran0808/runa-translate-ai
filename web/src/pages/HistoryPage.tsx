@@ -8,7 +8,8 @@ interface HistoryPageProps {
     sourceText: string,
     translatedText: string,
     sourceLang: 'es' | 'qu' | 'ay',
-    targetLang: 'es' | 'qu' | 'ay'
+    targetLang: 'es' | 'qu' | 'ay',
+    isCorrected: boolean
   ) => void;
 }
 
@@ -112,6 +113,11 @@ export default function HistoryPage({ onSelectRecord }: HistoryPageProps) {
                   <span className="bg-brand-gold/10 text-brand-gold border border-brand-gold/20 px-2.5 py-1 rounded-lg font-semibold">
                     {LANG_LABELS[record.targetLanguage] || record.targetLanguage}
                   </span>
+                  {record.context_corrected && (
+                    <span className="bg-brand-teal/10 text-brand-teal border border-brand-teal/20 px-2 py-0.5 rounded-md font-semibold text-[10px]">
+                      Verificada
+                    </span>
+                  )}
                   <span className="text-gray-500 ml-auto sm:ml-2">
                     {formatTime(record.timestamp)}
                   </span>
@@ -137,7 +143,8 @@ export default function HistoryPage({ onSelectRecord }: HistoryPageProps) {
                     record.sourceText,
                     record.translatedText,
                     record.sourceLanguage,
-                    record.targetLanguage
+                    record.targetLanguage,
+                    record.context_corrected || false
                   )
                 }
                 title="Cargar en el traductor"

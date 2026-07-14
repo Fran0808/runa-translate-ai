@@ -8,6 +8,7 @@ export type TranslationRecord = {
   sourceLanguage: LangCode;
   targetLanguage: LangCode;
   mode: string;
+  context_corrected?: boolean;
   timestamp: string;
 };
 
@@ -30,6 +31,11 @@ export type StatsData = {
   by_mode: ModeStat[];
 };
 
+export type TranslationResponseData = {
+  translatedText: string;
+  contextCorrected: boolean;
+};
+
 /**
  * Sends a text translation request to the backend.
  */
@@ -37,7 +43,7 @@ export async function translateText(
   text: string,
   sourceLang: LangCode,
   targetLang: LangCode
-): Promise<string> {
+): Promise<TranslationResponseData> {
   const res = await fetch(`${API_URL}/api/v1/translate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -54,7 +60,10 @@ export async function translateText(
 
   const data = await res.json();
   if (data.success) {
-    return data.data.translated_text;
+    return {
+      translatedText: data.data.translated_text,
+      contextCorrected: data.data.context_corrected || false,
+    };
   } else {
     throw new Error(data.error || 'Error al traducir');
   }
