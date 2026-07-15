@@ -29,11 +29,9 @@ La aplicación se compone de los siguientes módulos funcionales:
 *   **Reconocimiento de Voz (ASR)**: Transcripción automática de audio hablado (voz a texto) en lenguas regionales.
 *   **Síntesis de Voz (TTS)**: Lectura automática en audio de los textos traducidos (texto a voz) utilizando el motor nativo del navegador o APIs en la nube.
 
-### 3. Módulo Inteligente
-*   **Corrección Contextual**: Uso de modelos avanzados para adaptar la traducción al contexto cultural y lingüístico de la región, evitando traducciones literales incorrectas.
-
 ### 4. Módulo Administrativo
-*   **Historial de Traducciones**: Registro de las traducciones realizadas por los usuarios (almacenamiento local o en base de datos para usuarios invitados).
+*   **Autenticación de Usuarios (Firebase Auth):** Control de acceso seguro, registro y gestión de perfiles (soporta modo híbrido: Firebase real o simulador offline local).
+*   **Historial de Traducciones**: Registro de las traducciones realizadas asociadas al perfil de cada usuario y almacenadas de forma segura en la base de datos de MongoDB.
 *   **Panel de Estadísticas (Dashboard)**: Visualización agregada de métricas de uso, incluyendo total de traducciones diarias, idiomas más consultados y modalidades preferidas (texto o voz).
 
 ---
@@ -45,9 +43,9 @@ El sistema está estructurado bajo una arquitectura modular y desacoplada (monor
 *   **Frontend**: Desarrollado en **React** con **TypeScript** utilizando **Vite** para máxima velocidad de desarrollo y compilación. Diseño visual premium responsivo adaptado a dispositivos móviles.
 *   **Backend**: API REST construida con **FastAPI** (Python), aprovechando su tipado estático, alto rendimiento y generación automática de documentación interactiva (Swagger UI).
 *   **Base de Datos**: **MongoDB (Atlas)** en la nube para almacenamiento flexible de historiales y métricas.
-*   **Motor de IA**:
-    *   *Traducción*: Modelo open-source **Meta NLLB-200** (`facebook/nllb-200-distilled-600M`) e integración con la API de **OpenAI (GPT-4o)** para correcciones de contexto.
-    *   *Reconocimiento de Voz*: **Whisper** de OpenAI para transcripciones de alta precisión.
+*   **Motores de IA**:
+    *   *Traducción*: Modelo open-source **Meta NLLB-200** (`facebook/nllb-200-distilled-600M`) cargado de forma local, integrado con el **Módulo Inteligente de Corrección Contextual** mediante la API de **Google Gemini** (`gemini-2.5-flash-lite`).
+    *   *Módulo de Voz*: Implementación local basada en **Web Speech API** nativa del navegador para ASR (reconocimiento) y TTS (síntesis de voz) 100% gratuita y offline.
     *   *Síntesis de Voz*: API nativa **Web Speech API** del navegador para síntesis ligera en el cliente.
 
 ---

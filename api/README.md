@@ -41,6 +41,13 @@ El servidor requiere credenciales seguras para comunicarse con la base de datos 
      3. Selecciona tu proyecto o crea uno nuevo y haz clic en **"Create API Key in new project"**.
      4. Copia la clave de API generada (inicia con `AIzaSy...`) y pégala en tu archivo `.env` en la variable `GEMINI_API_KEY`.
 
+   * **Configurar el ID del Proyecto de Firebase (Opcional - Requerido para Autenticación Real)**:
+     * *Nota*: Esta variable le permite al backend validar y descifrar criptográficamente las firmas de los tokens JWT de tus usuarios autenticados reales de Firebase.
+     1. Abre tu proyecto en **[Firebase Console](https://console.firebase.google.com/)**.
+     2. Haz clic en el ícono de engranaje ⚙️ y selecciona **"Configuración del proyecto"**.
+     3. Copia el valor del campo **"ID del proyecto"** (Project ID, por ejemplo: `runa-78e7f`).
+     4. Pégalo en tu archivo `api/.env` en la variable `FIREBASE_PROJECT_ID`.
+
 ---
 
 ### Paso 2: Crear el Entorno Virtual de Python
