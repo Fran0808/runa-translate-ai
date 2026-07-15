@@ -17,13 +17,65 @@ cd web
 npm install
 ```
 
-### Paso 2: Configurar las Variables de Envío (Opcional)
-Por defecto, la aplicación web se conecta al backend en `http://localhost:8000`. Si necesitas cambiar esta dirección:
-1. Crea un archivo `.env` en la raíz del directorio `web/`.
-2. Agrega la variable con la URL de tu API:
-   ```env
-   VITE_API_URL=http://localhost:8000
+### Paso 2: Configurar las Variables de Entorno (Opcional)
+
+Por defecto, la aplicación web se conecta al backend en `http://localhost:8000`. Además, soporta **Autenticación con Firebase** en modo híbrido:
+1. **Modo de Simulación (Por defecto - Offline):** Si dejas las variables de Firebase vacías, la aplicación usará un simulador local. Podrás registrar usuarios e iniciar sesión offline sin necesidad de crear una cuenta en Firebase.
+2. **Modo Real (Firebase Cloud):** Si deseas conectarlo a la nube real de Firebase, sigue los pasos a continuación.
+
+#### Pasos Detallados para Configurar Firebase Real:
+
+Sigue este tutorial paso a paso basado directamente en la consola de Firebase Console para vincular tu aplicación:
+
+##### Paso A: Registrar la Aplicación Web y Obtener las Claves
+1. Inicia sesión en **[Firebase Console](https://console.firebase.google.com/)** y entra a tu proyecto (ej. `runa`).
+2. En el panel principal del proyecto, haz clic en el botón **`+ Agregar app`** (ubicado justo debajo del título del proyecto).
+3. Selecciona la plataforma **Web** haciendo clic en el ícono de código **`</>`**.
+4. Nombra tu aplicación como `RunaTranslate-Web` y haz clic en **"Registrar app"**.
+5. Firebase Console te mostrará un bloque de código javascript para inicializar el SDK. Copia los valores que aparecen dentro del objeto `const firebaseConfig = { ... }`:
+
+   ```javascript
+   const firebaseConfig = {
+     apiKey: "TU_API_KEY",
+     authDomain: "TU_PROYECTO.firebaseapp.com",
+     projectId: "TU_PROYECTO_ID",
+     storageBucket: "TU_PROYECTO.firebasestorage.app",
+     messagingSenderId: "TU_SENDER_ID",
+     appId: "TU_APP_ID"
+   };
    ```
+
+##### Paso B: Configurar el archivo `.env` del Frontend
+Crea o edita el archivo `.env` en la raíz de la carpeta `web/` y mapea los campos que copiaste de Firebase de la siguiente manera:
+
+```env
+# URL de conexión al backend
+VITE_API_URL=http://localhost:8000
+
+# Configuración del SDK de Firebase (Mapeo directo)
+VITE_FIREBASE_API_KEY=tu_apiKey_de_firebaseConfig
+VITE_FIREBASE_AUTH_DOMAIN=tu_authDomain_de_firebaseConfig
+VITE_FIREBASE_PROJECT_ID=tu_projectId_de_firebaseConfig
+VITE_FIREBASE_STORAGE_BUCKET=tu_storageBucket_de_firebaseConfig
+VITE_FIREBASE_MESSAGING_SENDER_ID=tu_messagingSenderId_de_firebaseConfig
+VITE_FIREBASE_APP_ID=tu_appId_de_firebaseConfig
+```
+
+##### Paso C: Configurar el archivo `.env` del Backend (FastAPI)
+Para que el servidor valide de forma segura los tokens de acceso de tus usuarios, debes copiar el **ID de tu proyecto** (`projectId`) al archivo `.env` del backend:
+1. Abre el archivo `api/.env`.
+2. Asigna el ID del proyecto en la variable correspondiente:
+   ```env
+   FIREBASE_PROJECT_ID=tu_projectId_de_firebaseConfig (ej. runa-78e7f)
+   ```
+
+##### Paso D: Activar el Método de Inicio de Sesión en Firebase Console
+Para habilitar que los usuarios puedan registrar cuentas en la base de datos de Google:
+1. En el menú lateral izquierdo de Firebase Console, haz clic en la sección **Seguridad** (o **Compilación / Build**).
+2. En el submenú que se despliega, haz clic en **`Authentication`**.
+3. En el panel principal de Authentication, selecciona la pestaña superior **"Método de acceso"** (o *Sign-in method*).
+4. En el listado de "Proveedores de acceso", busca la fila **"Correo electrónico/contraseña"** y haz clic en el interruptor **"Habilitar"** (los demás interruptores como Vínculo de correo electrónico deben quedarse desactivados).
+5. Haz clic en el botón azul **"Guardar"** para confirmar los cambios.
 
 ### Paso 3: Iniciar el Servidor de Desarrollo
 Para levantar el frontend de forma independiente con recarga en tiempo real (HMR):
