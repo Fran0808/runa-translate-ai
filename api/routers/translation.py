@@ -1,9 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from datetime import datetime
+from typing import Optional
 
 from models.translation import TranslationRequest, TranslationResponse, TranslationRecord
 from services.translation_service import translation_service
 from core.database import get_db
+from core.auth import User, get_current_user
 
 router = APIRouter(prefix="/api/v1", tags=["Traducción"])
 
@@ -14,7 +16,7 @@ router = APIRouter(prefix="/api/v1", tags=["Traducción"])
     summary="Traducir texto",
     description="Traduce un texto entre Español (es), Quechua (qu) y Aimara (ay) usando el modelo local Meta NLLB-200."
 )
-def translate_text(request: TranslationRequest):
+def translate_text(request: TranslationRequest, user: Optional[User] = Depends(get_current_user)):
     """
     Translates text between Spanish, Quechua, and Aymara.
 
@@ -47,6 +49,7 @@ def translate_text(request: TranslationRequest):
     if db is not None:
         try:
             record = TranslationRecord(
+                userId=user.uid if user else None,
                 sourceText=request.text,
                 translatedText=translated_text,
                 sourceLanguage=request.source_lang,
