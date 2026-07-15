@@ -13,6 +13,7 @@ class Settings:
     MONGODB_URI: str = os.getenv("MONGODB_URI", "")
     HF_API_TOKEN: str = os.getenv("HF_API_TOKEN", "")
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+    FIREBASE_PROJECT_ID: str = os.getenv("FIREBASE_PROJECT_ID", "")
     ENV_MODE: str = os.getenv("ENV_MODE", "development")
 
 settings = Settings()

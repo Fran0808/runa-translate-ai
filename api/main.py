@@ -6,6 +6,7 @@ from core.database import get_db
 from services.translation_service import translation_service
 from routers.translation import router as translation_router
 from routers.history import router as history_router
+from routers.auth import router as auth_router
 
 
 @asynccontextmanager
@@ -53,6 +54,7 @@ app.add_middleware(
 # Register routers
 app.include_router(translation_router)
 app.include_router(history_router)
+app.include_router(auth_router)
 
 
 @app.get("/", tags=["Estado"])
