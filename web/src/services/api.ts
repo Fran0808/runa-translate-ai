@@ -36,6 +36,12 @@ export type TranslationResponseData = {
   contextCorrected: boolean;
 };
 
+// Helper to get auth headers with the Firebase Bearer token
+function getAuthHeaders(): HeadersInit {
+  const token = localStorage.getItem('runa_auth_token');
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
 /**
  * Sends a text translation request to the backend.
  */
@@ -46,7 +52,10 @@ export async function translateText(
 ): Promise<TranslationResponseData> {
   const res = await fetch(`${API_URL}/api/v1/translate`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      ...getAuthHeaders()
+    },
     body: JSON.stringify({
       text,
       source_lang: sourceLang,
@@ -73,8 +82,13 @@ export async function translateText(
  * Fetches the list of the last 50 translations.
  */
 export async function getHistory(): Promise<TranslationRecord[]> {
-  const res = await fetch(`${API_URL}/api/v1/history`);
+  const res = await fetch(`${API_URL}/api/v1/history`, {
+    headers: getAuthHeaders()
+  });
   if (!res.ok) {
+    if (res.status === 401) {
+      throw new Error('Por favor, inicia sesión para ver tu historial.');
+    }
     throw new Error('Error al conectar con el servidor de historial');
   }
 
@@ -90,8 +104,16 @@ export async function getHistory(): Promise<TranslationRecord[]> {
  * Fetches usage statistics for the admin dashboard.
  */
 export async function getAdminStats(): Promise<StatsData> {
-  const res = await fetch(`${API_URL}/api/v1/admin/stats`);
+  const res = await fetch(`${API_URL}/api/v1/admin/stats`, {
+    headers: getAuthHeaders()
+  });
   if (!res.ok) {
+    if (res.status === 401) {
+      throw new Error('Por favor, inicia sesión para ver las estadísticas.');
+    }
+    if (res.status === 403) {
+      throw new Error('Acceso denegado. Solo administradores pueden ver las estadísticas.');
+    }
     throw new Error('Error al conectar con el servidor de estadísticas');
   }
 
